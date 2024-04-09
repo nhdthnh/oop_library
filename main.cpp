@@ -314,8 +314,6 @@ void BookInfo(){
     cin>> author;
     cout << "Book ID: ";
     cin >> bookID;
-    cin.ignore(); // Ignore newline character
-
     
     Book newBook(title, author, bookID, isAvailable);
     cout << "Do you want to borrow this book? (y/n): ";
@@ -323,19 +321,10 @@ void BookInfo(){
     if (choice == 'y' || choice == 'Y') {
         newBook.borrowBook();
         cout << "Book has been borrowed." << endl;
-        isAvailable = false;
-        
     } else {
         cout << "Book has not been borrowed." << endl;
-        isAvailable = true;
     }
-    
-    // Save book information to file
     newBook.saveToFile("books.txt");
-
-    // Display book information
-    cout << "Book Information:" << endl;
-    newBook.displayInfo();
 }
 
 
@@ -345,9 +334,11 @@ int main()
     do
     {
         cout << "Choose one of the following options:" << endl;
-        cout << "1. Enter student information" << endl;
-        cout << "2. Read student information from file" << endl;
-        cout << "3. Enter book" << endl;
+        cout << "1. Enter member information" << endl;
+        cout << "2. Show member list" << endl;
+        cout << "3. Enter book information" << endl;
+        cout << "4. Show book list" << endl;
+        cout << "5. Exit" << endl;
         cout << "Your choice: ";
         cin >> choice;
 
@@ -357,13 +348,19 @@ int main()
         }
         else if (choice == 2)
         {
-            readAndDisplayFromFileMember("students.txt");
-            vector<Book> books = readBooksFromFile("books.txt");
-            displayBookTable(books);
+            readAndDisplayFromFileMember("students.txt");    
         }
         else if (choice == 3)
         {
            BookInfo();
+        }
+        else if (choice == 4){
+            vector<Book> books = readBooksFromFile("books.txt");
+            displayBookTable(books);
+        }
+        else if (choice == 5){
+            cout<<"Exiting..."<<endl;
+            break;
         }
         else
         {
