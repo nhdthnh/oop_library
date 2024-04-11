@@ -213,7 +213,7 @@ void readAndDisplayFromFileMember(const string &filename)
 }
 
 
-void displayBookTable(const vector<Book>& books)
+void displayBookTable(const string& filename)
 {
     cout << "| " << setw(10) << left << "ID"
          << " | "
@@ -225,17 +225,6 @@ void displayBookTable(const vector<Book>& books)
          << " |" << endl;
     cout << "------------------------------------------------------------------------------------------------------------" << endl;
 
-    for (const auto& book : books)
-    {
-        book.displayInfo();
-    }
-
-    cout << "------------------------------------------------------------------------------------------------------------" << endl;
-}
-
-vector<Book> readBooksFromFile(const string& filename)
-{
-    vector<Book> books;
     ifstream file(filename);
     string line;
 
@@ -259,8 +248,14 @@ vector<Book> readBooksFromFile(const string& filename)
                 string author = tokens[2];
                 bool available = (tokens[3] == "Available");
 
-                Book book(title, author, bookID, available);
-                books.push_back(book);
+                cout << "| " << setw(10) << left << bookID
+                     << " | "
+                     << setw(35) << left << title
+                     << " | "
+                     << setw(20) << left << author
+                     << " | "
+                     << setw(15) << left << (available ? "Available" : "Not Available")
+                     << " |" << endl;
             }
         }
 
@@ -271,10 +266,69 @@ vector<Book> readBooksFromFile(const string& filename)
         cout << "Unable to open file " << filename << " for reading." << endl;
     }
 
-    return books;
+    cout << "------------------------------------------------------------------------------------------------------------" << endl;
 }
 
+void displayLoanTable(const string& filename)
+{
+    cout << "| " << setw(10) << left << "LoanID"
+         << " | "
+         << setw(10) << left << "StudentID"
+         << " | "
+         << setw(10) << left << "BookID"
+         << " | "
+         << setw(15) << left << "LoanDate"
+         << " | "
+         << setw(15) << left << "ReturnDate"
+         << " |" << endl;
+    cout << "------------------------------------------------------------------------------------------------------------" << endl;
 
+    ifstream file(filename);
+    string line;
+
+    if (file.is_open())
+    {
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string token;
+            vector<string> tokens;
+
+            while (getline(ss, token, ','))
+            {
+                tokens.push_back(token);
+            }
+
+            if (tokens.size() == 5)
+            {
+                int loanID = stoi(tokens[0]);
+                int studentID = stoi(tokens[1]);
+                int bookID = stoi(tokens[2]);
+                string loanDate = tokens[3];
+                string returnDate = tokens[4];
+
+                cout << "| " << setw(10) << left << loanID
+                     << " | "
+                     << setw(10) << left << studentID
+                     << " | "
+                     << setw(10) << left << bookID
+                     << " | "
+                     << setw(15) << left << loanDate
+                     << " | "
+                     << setw(15) << left << returnDate
+                     << " |" << endl;
+            }
+        }
+
+        file.close();
+    }
+    else
+    {
+        cout << "Unable to open file " << filename << " for reading." << endl;
+    }
+
+    cout << "------------------------------------------------------------------------------------------------------------" << endl;
+}
 
 void Member()
 {
@@ -327,6 +381,25 @@ void BookInfo(){
     newBook.saveToFile("books.txt");
 }
 
+void LoanInfo(){
+    int loanID1, studentID1, bookID1;
+    string loanDate1, returnDate1;
+
+    cout << "Enter loan:" << endl;
+    cout << "LoanID: ";
+    cin >> loanID1;
+    cout << "StudentID: ";
+    cin >> studentID1;
+    cout << "BookID: ";
+    cin >> bookID1;
+    cout << "LoanDate (yyyy-mm-dd): ";
+    cin >> loanDate1;
+    cout << "ReturnDate (yyyy-mm-dd, enter blank if not returned yet): ";
+    cin >> returnDate1;
+
+    Loan loan1(loanID1, studentID1, bookID1, loanDate1, returnDate1);
+    loan1.saveToFile("loan_records.txt");
+}
 
 int main()
 {
@@ -338,7 +411,9 @@ int main()
         cout << "2. Show member list" << endl;
         cout << "3. Enter book information" << endl;
         cout << "4. Show book list" << endl;
-        cout << "5. Exit" << endl;
+        cout << "5. Enter book borrowing information" << endl;
+        cout << "6. Show loan list" << endl;
+        cout << "7. Exit" << endl;
         cout << "Your choice: ";
         cin >> choice;
 
@@ -355,13 +430,19 @@ int main()
            BookInfo();
         }
         else if (choice == 4){
-            vector<Book> books = readBooksFromFile("books.txt");
-            displayBookTable(books);
+           displayBookTable("books.txt");
         }
         else if (choice == 5){
+           LoanInfo();
+        }
+        else if (choice == 6){
+           displayLoanTable("loan_records.txt");
+        }
+        else if (choice == 7){
             cout<<"Exiting..."<<endl;
             break;
         }
+        
         else
         {
             cout << "Invalid choice. Please try again." << endl;
